@@ -57,4 +57,4 @@ MIT (code). Datasets have their own licences; see the dataset cards.
 
 ## Funding
 
-Funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation), Walter Benjamin Programme.
+Funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation), Walter Benjamin Programme, project number 526052741.
