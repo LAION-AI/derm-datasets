@@ -1,0 +1,140 @@
+# Reference data for the representation analyses (72_skin_type_reference.py, 73_disease_prevalence.py).
+# Every number has a source; modelled values are marked as assumptions.
+
+skin_type:
+  # Measured: German SUN-Study 2012, anonymous telephone survey, n = 4,851, age 14-45 (self-reported Fitzpatrick type).
+  # I-II 32%, III 35%, IV 28%; the remaining 5% are types V-VI (rare in Germany) or missing.
+  # Schneider S, Diehl K, Bock C, et al. Sunbed use, user characteristics, and motivations for tanning: results from the
+  # German population-based SUN-Study 2012. JAMA Dermatol. 2013;149(1):43-49. doi:10.1001/2013.jamadermatol.562
+  germany_sun_study_2012:
+    groups: {I-II: 0.32, III: 0.35, IV: 0.28, V-VI_or_missing: 0.05}
+
+  # Modelled (no measured global distribution of Fitzpatrick types exists): population-weighted scenario.
+  # Population 2024, UN World Population Prospects 2024, SDG regions (billions; total 8.16).
+  # Regional shares of I-II / III-IV / V-VI are ASSUMPTIONS (broad ranges from the predominant constitutive skin
+  # colour of each region), given as a low-dark and a high-dark scenario. They are not measurements.
+  world_scenario:
+    population_bn:
+      Sub-Saharan Africa: 1.24
+      Central and Southern Asia: 2.15
+      Eastern and South-Eastern Asia: 2.35
+      Europe and Northern America: 1.13
+      Latin America and the Caribbean: 0.66
+      Northern Africa and Western Asia: 0.58
+      Oceania: 0.05
+    low_dark:            # [I-II, III-IV, V-VI]
+      Sub-Saharan Africa: [0.00, 0.15, 0.85]
+      Central and Southern Asia: [0.05, 0.65, 0.30]
+      Eastern and South-Eastern Asia: [0.15, 0.80, 0.05]
+      Europe and Northern America: [0.55, 0.41, 0.04]
+      Latin America and the Caribbean: [0.20, 0.65, 0.15]
+      Northern Africa and Western Asia: [0.10, 0.80, 0.10]
+      Oceania: [0.45, 0.45, 0.10]
+    high_dark:
+      Sub-Saharan Africa: [0.00, 0.05, 0.95]
+      Central and Southern Asia: [0.03, 0.47, 0.50]
+      Eastern and South-Eastern Asia: [0.10, 0.78, 0.12]
+      Europe and Northern America: [0.45, 0.47, 0.08]
+      Latin America and the Caribbean: [0.15, 0.60, 0.25]
+      Northern Africa and Western Asia: [0.05, 0.75, 0.20]
+      Oceania: [0.35, 0.50, 0.15]
+
+diseases:
+  # Global prevalent cases 2019, millions (95% UI), GBD 2019, as tabulated in:
+  # Szeto MD, Alhanshali L, Rundle CW, et al. Dermatologic Data From the Global Burden of Disease Study 2019 and the
+  # PatientsLikeMe Online Support Community: Comparative Analysis. JMIR Dermatol. 2024;7:e50449. doi:10.2196/50449 (Table 1)
+  # Concept matching: regular expressions on the SapBERT concept names (53_diagnosis_link.py); "exclude" removes
+  # look-alikes that belong to another GBD cause or none. Matched concepts are listed in work/bias/disease_concepts.csv.
+  gbd2019_prevalence_mn:
+    Fungal skin diseases:
+      value: [578.1, 521.0, 645.6]
+      include: ['\btinea\b', 'dermatophyt', 'onychomycos', 'pityriasis versicolor', 'tinea versicolor', '\bcandid', 'intertrigo candid', 'trichophyt', 'microspor', 'kerion', 'majocchi']
+      exclude: ['oral candid', 'oesophag', 'esophag', 'vagin', 'systemic', 'deep fungal', 'chronic mucocutaneous']
+    Acne vulgaris:
+      value: [231.2, 208.2, 255.5]
+      include: ['\bacne\b', 'comedo']
+      exclude: ['inversa', 'rosacea', 'keloidalis', 'necrotica', 'excori', 'agminata', 'conglobata.*hidradenitis', 'naevus comedonicus', 'nevus comedonicus', 'neonat', 'infantile', 'steroid', 'drug', 'chlor', 'mechanica', 'cosmetica', 'aestivalis', 'fulminans']
+    Scabies:
+      value: [187.4, 165.4, 212.1]
+      include: ['scabies', 'skabies', 'sarcopt']
+      exclude: []
+    Atopic dermatitis:
+      value: [171.2, 164.8, 178.1]
+      include: ['atopic dermatitis', 'atopic eczema', 'neurodermatitis atopica', 'neurodermitis', 'atopische']
+      exclude: []
+    Viral skin diseases (warts, molluscum):
+      value: [153.8, 148.7, 158.5]
+      include: ['\bwarts?\b', 'verruca', 'molluscum']
+      exclude: ['seborrh', 'genital', 'condyloma', 'anogenital', 'epidermodysplasia', 'tubercul']
+    Contact dermatitis:
+      value: [91.8, 74.5, 112.6]
+      include: ['contact dermatitis', 'contact eczema', 'kontaktekzem', 'kontaktdermatitis']
+      exclude: []
+    Pruritus:
+      value: [74.3, 66.4, 83.5]
+      include: ['^pruritus', 'chronic pruritus', '^itch']
+      exclude: ['ani\b', 'anus', 'vulva', 'scroti', 'gravidarum', 'urticarial papules', 'bullosa', 'dysplasia']
+    Urticaria:
+      value: [65.1, 57.5, 73.5]
+      include: ['urticaria']
+      exclude: ['pigmentosa', 'vasculitis', 'papular urticaria', 'urticaria perstans', 'pruritic urticarial', 'pupp']
+    Pyoderma (impetigo, folliculitis, furuncles):
+      value: [46.5, 45.4, 47.6]
+      include: ['impetig', 'ecthyma', 'furunc', 'carbunc', 'bacterial folliculitis', 'staphylococcal folliculitis', '^folliculitis$', 'pyoderma$', 'skin abscess', '^abscess']
+      exclude: ['gangrenosum', 'herpetiformis', 'vegetans', 'decalvans', 'eosinophil', 'pityrosporum', 'malassezia', 'gram-negative', 'ecthyma gangrenosum', 'contagiosum', 'myias']
+    Psoriasis:
+      value: [40.8, 39.4, 42.1]
+      include: ['psoria']
+      exclude: ['parapsoria', 'psoriasiform', 'arthritis', 'arthropathy']
+    Seborrheic dermatitis:
+      value: [22.9, 21.4, 24.3]
+      include: ['seborrh\w* (dermatitis|eczema)', 'seborrhoeic dermatitis', 'cradle cap', 'pityriasis capitis', 'dandruff']
+      exclude: ['keratos', 'psoria', 'walking']
+    Alopecia areata:
+      value: [18.4, 17.8, 19.0]
+      include: ['alopecia areata', 'alopecia totalis', 'alopecia universalis', 'ophiasis']
+      exclude: []
+    Malignant skin melanoma:
+      value: [2.1, 1.6, 2.6]
+      include: ['melanoma', 'lentigo maligna', 'hutchinson s melanotic freckle']
+      exclude: ['pseudomelanoma', 'melanoma-like', 'naevus', 'nevus', 'mimick']
+    Cellulitis:
+      value: [1.9, 1.8, 2.0]
+      include: ['cellulitis', 'erysipel']
+      exclude: ['eosinophilic cellulitis', 'wells', 'erysipeloid', 'dissecting', 'carcinom', 'mimic', 'erysipelothrix', 'psoriasis after']
+    Decubitus ulcer:
+      value: [0.9, 0.8, 0.9]
+      include: ['decubit', 'pressure ulcer', 'pressure sore', 'bedsore']
+      exclude: []
+
+  # Female share of GBD 2019 prevalent cases (= 100% - male share printed in Szeto et al. 2024, Table 1).
+  gbd2019_female_share:
+    Fungal skin diseases: 0.485
+    Acne vulgaris: 0.556
+    Scabies: 0.494
+    Atopic dermatitis: 0.591
+    Viral skin diseases (warts, molluscum): 0.485
+    Contact dermatitis: 0.549
+    Pruritus: 0.570
+    Urticaria: 0.589
+    Pyoderma (impetigo, folliculitis, furuncles): 0.454
+    Psoriasis: 0.499
+    Seborrheic dermatitis: 0.497
+    Alopecia areata: 0.656
+    Malignant skin melanoma: 0.486
+    Cellulitis: 0.476
+    Decubitus ulcer: 0.544
+
+  # Keratinocyte carcinoma: GBD 2019 reports incidence, not prevalence (prevalence is higher). Shown separately and
+  # not used in the shares above. Zhang W, Zeng W, Jiang A, et al. Global, regional and national incidence, mortality
+  # and disability-adjusted life-years of skin cancers and trend analysis from 1990 to 2019: an analysis of the Global
+  # Burden of Disease Study 2019. Cancer Med. 2021;10(14):4905-4922. doi:10.1002/cam4.4046 (4.0 M BCC, 2.4 M SCC in 2019)
+  gbd2019_incidence_mn:
+    Basal cell carcinoma:
+      value: [4.0, null, null]
+      include: ['basal cell carcinoma', 'basalioma', 'basaliom', 'rodent ulcer', '\bbcc\b']
+      exclude: ['nevoid basal cell', 'naevoid basal cell', 'gorlin']
+    Squamous cell carcinoma (incl. in situ):
+      value: [2.4, null, null]
+      include: ['squamous cell carcinoma', "bowen s disease", 'bowen disease', 'morbus bowen', 'spinalioma', 'spinaliom', '\bscc\b']
+      exclude: ['oral', 'lung', 'esophag', 'oesophag', 'cervi', 'bowenoid papulosis']

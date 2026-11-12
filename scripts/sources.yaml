@@ -1,0 +1,211 @@
+# Source registry: provenance + licence + release policy per source.
+# Licence facts were checked on 2026-10-12 against the live sites or Wayback
+# snapshots (URLs in `terms_url`). This is a documentation aid, not legal advice.
+#
+# release_tier:
+#   open        - images + text may be redistributed under the stated licence
+#   metadata    - only identifiers, URLs (or archive URLs), hashes and derived
+#                 annotations may be published; images and verbatim text stay internal
+#   internal    - nothing beyond aggregate statistics is published
+# All tiers are kept in the internal research copy (dataset/), which may only be
+# shared within a defined research group (§60d UrhG / Art. 3 DSM Directive).
+
+altmeyers:
+  name: Altmeyers Enzyklopädie
+  type: atlas
+  url: https://www.altmeyers.org
+  owner: EMG GmbH & Co. KG, Berlin
+  license: "© EMG GmbH & Co. KG - all rights reserved; non-commercial one-time low-res use after e-mail notice; images must keep watermark"
+  terms_url: https://www.altmeyers.org/en/licensing
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: true
+  notes: watermark must not be removed -> restored (inpainted) variants are internal only
+
+atlasdermatologico:
+  name: Atlas Dermatológico
+  type: atlas
+  url: https://www.atlasdermatologico.com.br
+  owner: Samuel Freire da Silva, MD (and contributors)
+  license: "free for non-commercial use with link to the website; © all rights reserved"
+  terms_url: https://www.atlasdermatologico.com.br/
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: true
+
+danderm:
+  name: DanDerm
+  type: atlas
+  url: https://danderm-pdv.is.kkh.dk/atlas
+  owner: Niels K. Veien
+  license: "free for teaching with attribution 'D@nderm'; no commercial use or publication without permission"
+  terms_url: https://danderm-pdv.is.kkh.dk/atlas/right.html
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: true
+
+dermaamin:
+  name: Dermaamin
+  type: atlas
+  url: https://www.dermaamin.com
+  owner: Dr Jihad Amin Al-Qattash (images largely collected from other sites and e-books)
+  license: "© Dermaamin - all rights reserved; true rights holders unknown"
+  terms_url: https://web.archive.org/web/20200727043611/http://www.dermaamin.com/site/
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: true
+  notes: provenance unknown (aggregated from third-party sites); labels are folder names and occasionally wrong
+
+dermatlas:
+  name: Interactive Dermatology Atlas (dermatlas.net)
+  type: atlas
+  url: https://www.dermatlas.net
+  owner: Richard Usatine / Interactive Dermatology Atlas
+  license: "© Interactive Dermatology Atlas; terms page unavailable (unverified)"
+  terms_url: https://www.dermatlas.net/about
+  ai_training_clause: unverified
+  release_tier: metadata
+  publish_url: true
+
+dermatoweb:
+  name: Dermatoweb (Universitat de Lleida)
+  type: atlas
+  url: http://dermatoweb2.udl.es
+  owner: Servei de Dermatologia, Hospital Arnau de Vilanova, Lleida
+  license: "© Dermatoweb - all rights reserved"
+  terms_url: https://web.archive.org/web/20241211073047/http://dermatoweb2.udl.es/
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: archive   # original domain now hijacked by spam -> publish Wayback URLs only
+  language: es
+
+dermis:
+  name: DermIS (dermis.net)
+  type: atlas
+  url: https://www.dermis.net
+  owner: Dept. of Clinical Social Medicine, University of Heidelberg
+  license: "© strictly protected; hyperlinking to the URL is the permitted form of use"
+  terms_url: https://www.dermis.net/e04info/e05copyright/index_eng.html
+  ai_training_clause: "'All mechanic processing of the images is prohibited!' (FAQ on deep learning/AI)"
+  release_tier: metadata
+  publish_url: true
+  notes: explicit prohibition of AI processing in site terms - see docs/LICENSES.md
+
+dermnet:
+  name: DermNet (New Zealand)
+  type: atlas
+  url: https://dermnetnz.org
+  owner: DermNet New Zealand Trust
+  license: "CC BY-NC-ND 4.0 for watermarked images (older terms page: 3.0)"
+  terms_url: https://dermnetnz.org/image-licence
+  ai_training_clause: "§25: images may not be distributed for training or testing AI models; §3(d) watermark must not be removed"
+  release_tier: metadata
+  publish_url: true
+  notes: restored (watermark-removed) variants must never leave the internal copy
+
+hellenicdermatlas:
+  name: Hellenic Dermatological Atlas
+  type: atlas
+  url: http://www.hellenicdermatlas.com
+  owner: TERASOFT Ltd (ed. C. D. Verros)
+  license: "all rights reserved; any use requires written permission"
+  terms_url: https://web.archive.org/web/20221007082444/http://www.hellenicdermatlas.com/en/terms/
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: archive   # domain now hijacked by spam
+  notes: contributor names in Greek
+
+iconotheque:
+  name: Iconothèque de dermatologie (ULB, Hôpital Erasme)
+  type: atlas
+  url: https://icono.ulb.ac.be
+  owner: "Prof. M. Heenen, Service de Dermatologie, CUB Hôpital Erasme, Bruxelles (per record)"
+  license: "copyright Prof. Heenen (per-record 'Droits d'auteur' field)"
+  terms_url: https://icono.ulb.ac.be
+  ai_training_clause: unverified
+  release_tier: metadata
+  publish_url: true
+  language: fr
+
+mddk:
+  name: MDDK.com
+  type: atlas
+  url: https://mddk.com
+  owner: MDDK.com (image provenance unknown)
+  license: "© MDDK.com - all rights reserved"
+  terms_url: https://mddk.com/
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: true
+  notes: provenance unknown
+
+meddean:
+  name: Loyola University Chicago dermatology (Melton & Swanson)
+  type: atlas
+  url: https://www.meddean.luc.edu/lumen/meded/medicine/dermatology/melton/
+  owner: J.L. Melton, J.R. Swanson / Loyola University Chicago
+  license: "duplication other than personal use requires written permission"
+  terms_url: https://web.archive.org/web/20160121082956/http://www.meddean.luc.edu/lumen/MedEd/medicine/dermatology/melton/title.htm
+  ai_training_clause: not stated
+  release_tier: metadata
+  publish_url: archive   # domain no longer resolves
+
+uiowa:
+  name: University of Iowa Dermatology image collection
+  type: atlas
+  url: https://medicine.uiowa.edu/dermatology
+  owner: University of Iowa Department of Dermatology and contributing authors
+  license: "CC BY-NC-ND 3.0 (stated for the Skin of Color Image Atlas; verify for the clinical image index)"
+  terms_url: https://www.healthcare.uiowa.edu/skinofcolor/atlas/
+  ai_training_clause: not stated
+  release_tier: metadata   # ND + unverified scope -> metadata only by default
+  publish_url: true
+
+viamedici:
+  name: via medici Blickdiagnosen (Thieme)
+  type: atlas
+  url: https://viamedici.thieme.de
+  owner: Georg Thieme Verlag
+  license: "© Georg Thieme Verlag; subscription content; TDM reserved under §44b UrhG; no AI training"
+  terms_url: https://www.thieme.com/en-us/imprint/thieme-usa
+  ai_training_clause: "machine-readable TDM reservation (robots.txt) + imprint"
+  release_tier: internal
+  publish_url: false
+  language: de
+
+braun-falco:
+  name: "Braun-Falco's Dermatologie, Venerologie und Allergologie (7th ed., 2018)"
+  type: textbook
+  owner: Springer-Verlag GmbH Deutschland
+  license: "© Springer 2018 - all rights reserved (accessed via TUM institutional licence)"
+  release_tier: internal
+  publish_url: false
+  language: de
+
+fritsch:
+  name: "Fritsch & Schwarz: Dermatologie Venerologie (3rd ed., 2018)"
+  type: textbook
+  owner: Springer-Verlag GmbH Deutschland
+  license: "© Springer 2018 - all rights reserved (accessed via TUM institutional licence)"
+  release_tier: internal
+  publish_url: false
+  language: de
+
+# Journals: per-article licence is detected from the article HTML (see
+# 11_ingest_journals.py). Articles with a detected Creative Commons licence get
+# release_tier = open (subject to the exact CC variant); all others = metadata
+# (DOI + figure number + derived labels, no image, no verbatim caption).
+
+uptodate:
+  name: UpToDate (Wolters Kluwer) - dermatology topics
+  type: reference
+  license: "© UpToDate, Inc.; terms explicitly prohibit use of content to train AI/ML models"
+  release_tier: excluded
+  notes: excluded from the dataset entirely (documented only)
+
+congress-media:
+  name: Congress talk recordings (14 talks, ~14.1 h, German)
+  type: media
+  license: "© speakers / congress organiser; no licence for redistribution or training known"
+  release_tier: excluded
+  notes: excluded (listed in docs/EXCLUDED.md); transcription would require speaker consent

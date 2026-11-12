@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+*.sqlite*
+*.jsonl
+work/
+dataset/
+external/
+.venv/
+.env

@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Model Comparison</title>
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --panel2: #f0f0ec; --text: #1d1f21; --muted: #5d6268; --faint: #81868c;
+  --border: #dcdcd6; --accent: #1f6f78; --accent-weak: #e1efef; --accent-text: #ffffff;
+  --mark: #fff1b8; --mark-text: #3b2f00; --danger: #a33a2c; --ok: #2f6b3a; --best: #2f6b3a; --best-weak: #e3f1e5; --gated: #8a5a00;
+  --shadow: 0 1px 2px rgba(0,0,0,.06); --tap: 34px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171a; --panel: #1d2024; --panel2: #24282d; --text: #e8e9ea; --muted: #a7adb3; --faint: #858b92;
+    --border: #353a40; --accent: #5fb3b9; --accent-weak: #1f3638; --accent-text: #0e1416;
+    --mark: #4a3f12; --mark-text: #fff3c4; --danger: #ef8a7a; --ok: #8fd19e; --best: #8fd19e; --best-weak: #1f3324; --gated: #e6b65c;
+    --shadow: none; color-scheme: dark;
+  }
+}
+@media (pointer: coarse), (max-width: 900px) { :root { --tap: 44px; } }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); -webkit-text-size-adjust: 100%;
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea { font-size: 16px; }
+a { color: var(--accent); }
+header { position: sticky; top: 0; z-index: 10; background: var(--panel); border-bottom: 1px solid var(--border); padding: 8px 16px; }
+.hrow { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+header h1 { font-size: 16px; margin: 0; font-weight: 650; white-space: nowrap; }
+.hlink { font-size: 13px; white-space: nowrap; }
+.filters { display: contents; }
+.filters label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; min-width: 0; }
+select, input[type=text] { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; max-width: 240px; min-height: 34px; min-width: 0; }
+.switch { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.switch input { width: 20px; height: 20px; }
+.progress { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.bar { width: 120px; height: 8px; border-radius: 4px; background: var(--panel2); border: 1px solid var(--border); overflow: hidden; }
+.bar > div { height: 100%; background: var(--accent); width: 0; }
+#filterBtn { display: none; }
+.wrap { padding: 14px 16px 40px; max-width: 2400px; margin: 0 auto; }
+.btn { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: var(--shadow); min-height: var(--tap); }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.btn:disabled { opacity: .45; cursor: default; }
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; box-shadow: var(--shadow); min-width: 0; }
+.panel h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 8px; font-weight: 650; }
+.banner { background: var(--best-weak); border: 1px solid var(--best); color: var(--text); border-radius: 10px; padding: 8px 14px; margin-bottom: 12px; font-size: 14px; overflow-wrap: anywhere; }
+.banner b { color: var(--best); }
+.plan { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.plan .t { font-size: 19px; font-weight: 650; overflow-wrap: anywhere; }
+.plan .gid { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--faint); overflow-wrap: anywhere; }
+.meta { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 2px 12px; font-size: 14px; margin-top: 6px; }
+.meta > div { overflow-wrap: anywhere; }
+.meta .k { color: var(--muted); }
+details.plandet > summary { display: none; }
+.caption { font-size: 15.5px; line-height: 1.5; padding: 8px 12px; background: var(--accent-weak); border-radius: 8px; overflow-wrap: anywhere; }
+.nav { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.tabs { display: none; }
+.cols { display: grid; gap: 14px; margin-bottom: 14px; align-items: start; }
+.cols.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cols.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cols.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 2200px) { .cols.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.col { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px 12px; box-shadow: var(--shadow); min-width: 0; }
+.col.best { border-color: var(--best); box-shadow: 0 0 0 2px var(--best); }
+.colhead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.letter { font-size: 22px; font-weight: 700; color: var(--accent); width: 32px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--accent); border-radius: 8px; flex: none; }
+.armlabel { font-weight: 600; overflow-wrap: anywhere; }
+.armlabel.hidden { color: var(--faint); font-weight: 400; font-style: italic; }
+.tierbadge { font-size: 11px; border-radius: 999px; padding: 0 7px; border: 1px solid var(--gated); color: var(--gated); white-space: nowrap; opacity: .9; }
+.imgbox { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 1 / 1; max-height: 72vh; overflow: hidden; cursor: zoom-in; }
+.imgbox img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.placeholder { aspect-ratio: 1 / 1; max-height: 72vh; border: 2px dashed var(--danger); border-radius: 8px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; color: var(--danger); padding: 20px; gap: 6px; }
+.placeholder small { color: var(--muted); }
+.dims { font-size: 12px; color: var(--faint); margin: 4px 0 6px; display: flex; justify-content: flex-end; }
+.qrow { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 6px; margin: 6px 0; }
+.qrow .lab { font-size: 12.5px; color: var(--muted); line-height: 1.2; }
+.seg { display: flex; flex-wrap: wrap; gap: 5px; }
+.seg button { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 3px 9px; cursor: pointer; font-size: 13px; min-height: var(--tap); min-width: var(--tap); }
+.seg button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.seg.bestseg button.on { background: var(--best); border-color: var(--best); color: var(--accent-text); }
+textarea { width: 100%; background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; resize: vertical; line-height: 1.45; }
+textarea:focus, select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.col textarea.ccomment { min-height: 90px; margin-top: 6px; }
+details > summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 8px; min-height: 26px; }
+.diff { font-size: 11px; border-radius: 4px; padding: 0 6px; background: var(--mark); color: var(--mark-text); margin-left: 4px; }
+.pparts { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 10px; margin-top: 6px; }
+.pparts .lab { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding-top: 2px; }
+.pparts .lab .sub { display: block; text-transform: none; letter-spacing: 0; }
+.pparts .val { font-size: 14px; overflow-wrap: anywhere; }
+.pparts .val.strong { font-weight: 600; }
+.pparts .val.boiler, .pparts .lab.boiler { color: var(--faint); font-size: 12px; }
+mark { background: var(--mark); color: var(--mark-text); border-radius: 3px; padding: 0 2px; }
+.raw { white-space: pre-wrap; font-size: 12.5px; line-height: 1.5; background: var(--panel2); border-radius: 8px; padding: 8px 10px; margin-top: 6px; overflow-wrap: anywhere; }
+.kv { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 2px 10px; font-size: 12.5px; margin-top: 4px; }
+.kv > div { overflow-wrap: anywhere; }
+.kv .k { color: var(--muted); }
+.hist { border-top: 1px solid var(--border); padding: 6px 0; font-size: 13px; }
+.hist:first-child { border-top: 0; }
+.hist .head { font-size: 12px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+.hist .comment { white-space: pre-wrap; margin: 2px 0; overflow-wrap: anywhere; }
+.hist .fields { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.gform .row { display: flex; gap: 10px 18px; flex-wrap: wrap; align-items: center; margin: 6px 0 10px; }
+.gform .row .lab { font-size: 13.5px; color: var(--muted); min-width: 120px; }
+.rank { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; }
+.rank select { min-height: var(--tap); }
+.gform textarea#gcomment { min-height: 110px; }
+.formbar { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.status { font-size: 13px; color: var(--muted); }
+.status.err { color: var(--danger); }
+.status.ok { color: var(--ok); }
+.hint { font-size: 12px; color: var(--faint); margin-top: 8px; }
+kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--panel2); }
+.empty { padding: 60px 20px; text-align: center; color: var(--muted); }
+.bottombar { display: none; }
+
+/* ---------- phones & tablets: arms become swipeable cards ---------- */
+@media (max-width: 900px) {
+  header { position: static; padding: 8px 12px; }
+  #filterBtn { display: inline-flex; align-items: center; }
+  .filters { display: none; width: 100%; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  header.showfilters .filters { display: grid; }
+  .filters label { flex-direction: column; align-items: stretch; gap: 2px; font-size: 12px; }
+  .filters label.switch { flex-direction: row; align-items: center; min-height: 44px; }
+  .filters select, .filters input[type=text] { max-width: none; width: 100%; min-height: 44px; }
+  .progress { margin-left: 0; width: 100%; }
+  .bar { flex: 1; width: auto; }
+  .wrap { padding: 10px 10px 96px; }
+  .panel { padding: 10px 12px; margin-bottom: 10px; }
+  .plan { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  details.plandet > summary { display: list-item; margin-top: 4px; }
+  .nav #prev, .nav #next { display: none; }
+  .tabs { display: flex; gap: 6px; position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 6px 0; align-items: center; }
+  .tabs button { flex: 1; min-height: 44px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel); font-size: 17px; font-weight: 700; color: var(--accent); }
+  .tabs button.cur { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .tabs button.isbest::after { content: " ★"; font-size: 13px; }
+  .tabs .swipehint { font-size: 12px; color: var(--faint); white-space: nowrap; }
+  .cols.n2, .cols.n3, .cols.n4 { display: flex; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px;
+    overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .cols::-webkit-scrollbar { display: none; }
+  .col { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+  .qrow { grid-template-columns: minmax(0, 1fr); gap: 4px; margin: 10px 0; }
+  .seg button { flex: 1 1 auto; font-size: 15px; }
+  .pparts { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .pparts .lab { margin-top: 6px; }
+  .gform .row { flex-direction: column; align-items: stretch; gap: 6px; }
+  .gform .row .lab { min-width: 0; }
+  .formbar .btn { flex: 1 1 auto; }
+  .hint .keys { display: none; }
+  .bottombar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; gap: 8px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    background: var(--panel); border-top: 1px solid var(--border); }
+  .bottombar .btn { flex: 1; min-height: 48px; font-size: 16px; }
+  .bottombar .btn.primary { flex: 2; }
+}
+</style>
+<script src="/static/common.js"></script>
+</head>
+<body>
+<header id="hdr">
+  <div class="hrow">
+    <h1>Compare models</h1>
+    <a class="hlink" href="/">← Single-item view</a>
+    <button class="btn" id="filterBtn" type="button" aria-expanded="false">Filters</button>
+    <div class="filters">
+      <label>Set <select id="fSet"></select></label>
+      <label>Show <select id="fFilter">
+        <option value="uncompared">Not yet compared</option>
+        <option value="all">All</option>
+        <option value="compared">Compared</option>
+      </select></label>
+      <label>Diagnosis <select id="fDx"><option value="">All diagnoses</option></select></label>
+      <label>Fitzpatrick <select id="fFst"><option value="">All</option></select></label>
+      <label class="switch" title="Randomise column order and hide model names until saved"><input type="checkbox" id="blind"> Blind</label>
+      <label>Annotator <input type="text" id="annotator" size="13" autocomplete="off" autocapitalize="off"></label>
+    </div>
+    <div class="progress"><span id="progText">–</span><div class="bar"><div id="progBar"></div></div></div>
+  </div>
+</header>
+
+<div class="wrap" id="main">
+  <div id="banner"></div>
+  <div class="panel">
+    <div class="plan">
+      <div>
+        <div class="t" id="ptitle">Loading…</div>
+        <div class="gid" id="pgid"></div>
+        <details class="plandet" id="plandet" open><summary>Plan details</summary><div class="meta" id="pmeta"></div></details>
+      </div>
+      <div>
+        <h2>Training caption (shared plan row)</h2>
+        <div class="caption" id="pcaption"></div>
+        <div class="nav">
+          <button class="btn" id="prev" title="Previous group (←)">← Prev</button>
+          <span id="pos">–</span>
+          <button class="btn" id="next" title="Next group (→)">Next →</button>
+          <span id="blindinfo"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="cols" id="cols"></div>
+
+  <div class="panel gform">
+    <h2>Group judgement</h2>
+    <div class="row"><span class="lab">Best output</span><div class="seg bestseg" id="bestseg"></div></div>
+    <div class="row"><span class="lab">Ranking (optional)</span><span id="ranks"></span></div>
+    <textarea id="gcomment" data-grow placeholder="What does each model do well, and what does it lack? (e.g. A: best morphology but wrong site; B: most realistic skin texture; C: …)"></textarea>
+    <details id="combdet"><summary>Best combination (optional)</summary>
+      <textarea id="gcomb" data-grow rows="3" placeholder="How would you combine the strengths? (e.g. B's base image + A's lesion morphology; use C's colour on dark skin)"></textarea>
+    </details>
+    <div class="formbar">
+      <button class="btn primary" id="saveNext">Save &amp; next</button>
+      <button class="btn" id="save">Save</button>
+      <button class="btn" id="clear" type="button">Clear form</button>
+      <span class="status" id="status"></span>
+    </div>
+    <div class="hint"><span class="keys"><kbd>Ctrl/⌘</kbd>+<kbd>Enter</kbd> save all columns + group &amp; next · <kbd>←</kbd>/<kbd>→</kbd> prev/next group · <kbd>Esc</kbd> leave field / close zoom. </span>
+      Saving writes one assessment per filled column plus one comparison. Nothing is overwritten; saving again adds new entries.</div>
+    <details id="chistdet"><summary>Earlier comparisons of this group <span id="chistn"></span></summary><div id="chist"></div></details>
+  </div>
+</div>
+<div class="empty" id="empty" style="display:none"></div>
+
+<nav class="bottombar" id="bottombar">
+  <button class="btn" id="bPrev" type="button">← Group</button>
+  <button class="btn primary" id="bSaveNext" type="button">Save &amp; next</button>
+  <button class="btn" id="bNext" type="button">Group →</button>
+</nav>
+
+<script>
+"use strict";
+const FIELDS = ["verdict", "realism", "dx_recognisable", "skin_type_correct", "site_correct", "stage_correct"];
+const S = { groups: [], idx: 0, g: null, cf: [], best: null, dirty: false, saving: false, total: 0, compared: 0 };
+
+function sessionId() {
+  const mk = () => { const a = new Uint8Array(12); crypto.getRandomValues(a); return Array.from(a, b => b.toString(16).padStart(2, "0")).join(""); };
+  try { let s = sessionStorage.getItem("cmpSession"); if (!s) { s = mk(); sessionStorage.setItem("cmpSession", s); } return s; }
+  catch (e) { return (window.__cmpSession = window.__cmpSession || mk()); }
+}
+const SESSION = sessionId();
+
+/* ---------- rendering ---------- */
+function kv(obj) {
+  const e = Object.entries(obj || {}).filter(([, v]) => v !== null && v !== undefined && typeof v !== "object");
+  return e.length ? `<div class="kv">${e.map(([k, v]) => `<div class="k">${esc(k)}</div><div>${esc(v)}</div>`).join("")}</div>` : `<div class="status">none</div>`;
+}
+function segHTML(field, opts, pos) {
+  return `<div class="seg" data-field="${field}" data-pos="${pos}">${opts.map(([v, t]) => `<button type="button" data-v="${v}">${esc(t)}</button>`).join("")}</div>`;
+}
+const TRI = [["yes", "yes"], ["no", "no"], ["unsure", "unsure"]];
+function histHTML(h) {
+  if (!h || !h.length) return `<div class="status">No assessments yet.</div>`;
+  return h.map(a => {
+    const f = [["verdict", a.verdict === "none" ? "none (good)" : a.verdict], ["realism", a.realism], ["dx", a.dx_recognisable],
+      ["skin", a.skin_type_correct], ["site", a.site_correct], ["stage", a.stage_correct]].filter(([, v]) => v != null && v !== "")
+      .map(([k, v]) => `${k}: <b>${esc(v)}</b>`).join(" · ");
+    return `<div class="hist"><div class="head"><span>#${a.id}</span><span>${esc(new Date(a.created_at).toLocaleString())}</span><span>${esc(a.annotator)}</span>${a.compare_group ? "<span>(comparison)</span>" : ""}</div>
+      ${a.comment ? `<div class="comment">${esc(a.comment)}</div>` : ""}${f ? `<div class="fields">${f}</div>` : ""}</div>`;
+  }).join("");
+}
+function render() {
+  const g = S.g, p = g.plan || {};
+  $("ptitle").textContent = [p.diagnosis, p.variant, p.stage].filter(Boolean).join(" · ") || g.group_key;
+  $("pgid").textContent = `${g.group_id}${g.revealed && g.blind ? " · revealed" : ""}`;
+  const rows = [["Diagnosis", p.diagnosis], ["Variant", p.variant], ["Stage", p.stage],
+    ["Site", [p.site, p.site_coarse && p.site_coarse !== p.site ? `(${p.site_coarse})` : null].filter(Boolean).join(" ")],
+    ["Fitzpatrick", p.fitzpatrick ?? p.fst_target], ["Age", [p.age, p.age_group].filter(v => v != null && v !== "").join(" · ")],
+    ["Sex", p.sex], ["Ancestry", p.ancestry], ["View", p.view]].filter(([, v]) => v !== undefined && v !== null && v !== "");
+  $("pmeta").innerHTML = rows.map(([k, v]) => `<div class="k">${esc(k)}</div><div>${esc(v)}</div>`).join("");
+  $("pcaption").textContent = p.caption || "(no caption in plan)";
+  $("blindinfo").textContent = g.blind ? (g.revealed ? "Blind: saved in this session, labels revealed" : "Blind: order randomised, model names hidden until saved") : "Not blind: canonical order, labels shown";
+  const n = g.columns.length;
+  const prompts = g.columns.map(c => c.prompt || "");
+  const cols = $("cols"); cols.className = "cols n" + n;
+  cols.innerHTML = g.columns.map(c => {
+    const label = c.label ? `<span class="armlabel">${esc(c.label)}</span>` : `<span class="armlabel hidden">model hidden</span>`;
+    const tier = c.tier && c.tier !== "open" ? `<span class="tierbadge" title="tier ${esc(c.tier)}: visible here, gated at release">gated · ${esc(c.tier)}</span>` : "";
+    if (c.gated_hidden || c.missing) {
+      return `<div class="col" data-pos="${c.pos}"><div class="colhead"><span class="letter">${c.letter}</span>${label}<span class="tierbadge">gated</span></div>
+        <div class="placeholder"><b>${c.missing ? "Item missing from the database" : "Gated item — open the gated link"}</b>
+        <small>${c.missing ? "Re-run the importer." : "This server requires the gate token. Open the gated access link once in this browser, then reload."}</small></div></div>`;
+    }
+    const differs = prompts.some(q => q && q !== c.prompt);
+    return `<div class="col" data-pos="${c.pos}">
+      <div class="colhead"><span class="letter">${c.letter}</span>${label}${tier}</div>
+      <div class="imgbox" data-zoom="${esc(c.image_url)}" title="Tap / click to zoom to full resolution"><img src="${esc(c.preview_url || c.image_url)}" alt="output ${c.letter}" data-pos="${c.pos}" decoding="async"></div>
+      <div class="dims"><a href="${esc(c.image_url)}" target="_blank" rel="noopener">original</a></div>
+      <div class="qrow"><span class="lab">Needs work</span>${segHTML("verdict", [["none", "none (good)"], ["caption", "caption"], ["image", "image"], ["both", "both"], ["discard", "discard"]], c.pos)}</div>
+      <div class="qrow"><span class="lab">Realism</span>${segHTML("realism", [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"], ["5", "5"]], c.pos)}</div>
+      <div class="qrow"><span class="lab">Dx recognisable</span>${segHTML("dx_recognisable", TRI, c.pos)}</div>
+      <div class="qrow"><span class="lab">Skin type correct</span>${segHTML("skin_type_correct", TRI, c.pos)}</div>
+      <div class="qrow"><span class="lab">Site correct</span>${segHTML("site_correct", TRI, c.pos)}</div>
+      <div class="qrow"><span class="lab">Stage / morph. correct</span>${segHTML("stage_correct", TRI, c.pos)}</div>
+      <textarea class="ccomment" data-grow data-pos="${c.pos}" placeholder="Output ${c.letter}: what is good, what is wrong…"></textarea>
+      <details class="pdet"><summary>Prompt${differs ? '<span class="diff">differs from other columns</span>' : ""}</summary>${promptPartsHTML(c.prompt)}<div class="raw">${esc(c.prompt || "(no prompt)")}</div></details>
+      <details><summary>Automatic checks (may bias)</summary>${kv((c.metadata || {}).auto_checks)}</details>
+      <details><summary>History of this image (${(c.history || []).length})</summary>${histHTML(c.history)}</details>
+    </div>`;
+  }).join("");
+  // narrow screens: A/B/C/D tabs that follow the swipeable cards
+  $("tabs").innerHTML = g.columns.map(c => `<button type="button" data-pos="${c.pos}">${c.letter}</button>`).join("") + `<span class="swipehint">swipe ⇆</span>`;
+  $("tabs").querySelectorAll("button").forEach(b => b.addEventListener("click", () => scrollToCard(+b.dataset.pos)));
+  cols.scrollLeft = 0; updateTabs();
+  // per-column form wiring
+  cols.querySelectorAll(".seg").forEach(seg => seg.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    const f = S.cf[+seg.dataset.pos]; const k = seg.dataset.field;
+    f[k] = f[k] === b.dataset.v ? null : b.dataset.v; S.dirty = true; syncSeg();
+  })));
+  cols.querySelectorAll("textarea.ccomment").forEach(t => t.addEventListener("input", () => { S.cf[+t.dataset.pos].comment = t.value; S.dirty = true; }));
+  cols.querySelectorAll(".imgbox").forEach(b => b.addEventListener("click", () => Zoom.open(b.dataset.zoom)));
+  attachAutoGrow(cols);
+  const pd = store.get("cmpPromptOpen", "0") === "1";
+  cols.querySelectorAll("details.pdet").forEach(d => { d.open = pd; d.addEventListener("toggle", () => store.set("cmpPromptOpen", d.open ? "1" : "0")); });
+  // group form
+  const vis = g.columns.filter(c => !c.gated_hidden && !c.missing);
+  $("bestseg").innerHTML = vis.map(c => `<button type="button" data-v="${c.pos}">${c.letter}</button>`).join("") + `<button type="button" data-v="none">none</button>`;
+  $("bestseg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { S.best = S.best === b.dataset.v ? null : b.dataset.v; S.dirty = true; syncSeg(); }));
+  $("ranks").innerHTML = vis.map(c => `<span class="rank">${c.letter} <select data-pos="${c.pos}"><option value="">–</option>${vis.map((_, i) => `<option>${i + 1}</option>`).join("")}</select></span>`).join(" ");
+  $("ranks").querySelectorAll("select").forEach(s => s.addEventListener("change", () => S.dirty = true));
+  const h = g.comparisons || [];
+  $("chistn").textContent = h.length ? `(${h.length})` : "";
+  $("chist").innerHTML = h.length ? h.map(c => `<div class="hist"><div class="head"><span>#${c.id}</span><span>${esc(new Date(c.created_at).toLocaleString())}</span><span>${esc(c.annotator)}</span><span>${c.blind ? "blind" : "not blind"}</span>
+      <span>best: <b>${c.no_best ? "none" : esc(c.best_letter || "–")}</b></span>${c.ranking_letters.length ? `<span>ranking: ${esc(c.ranking_letters.join(" > "))}</span>` : ""}
+      ${c.shown_labels ? `<span>then shown: ${esc(c.shown_labels.join(" | "))}</span>` : ""}</div>
+      ${c.comment ? `<div class="comment">${esc(c.comment)}</div>` : ""}${c.combination_note ? `<div class="fields">combination: ${esc(c.combination_note)}</div>` : ""}</div>`).join("")
+    : `<div class="status">None yet.</div>`;
+  syncSeg();
+}
+function scrollToCard(pos) { const cols = $("cols"), card = cols.querySelector(`.col[data-pos="${pos}"]`); if (card) cols.scrollTo({ left: card.offsetLeft - cols.offsetLeft, behavior: "smooth" }); }
+function updateTabs() {
+  const cols = $("cols"); const w = cols.clientWidth || 1;
+  const cur = Math.round(cols.scrollLeft / (w + 10));
+  $("tabs").querySelectorAll("button").forEach(b => b.classList.toggle("cur", +b.dataset.pos === cur));
+}
+$("cols").addEventListener("scroll", () => requestAnimationFrame(updateTabs), { passive: true });
+function syncSeg() {
+  $("cols").querySelectorAll(".seg").forEach(seg => { const f = S.cf[+seg.dataset.pos] || {};
+    seg.querySelectorAll("button").forEach(b => b.classList.toggle("on", f[seg.dataset.field] === b.dataset.v)); });
+  $("bestseg").querySelectorAll("button").forEach(b => b.classList.toggle("on", S.best === b.dataset.v));
+  $("cols").querySelectorAll(".col").forEach(c => c.classList.toggle("best", S.best === c.dataset.pos));
+  $("tabs").querySelectorAll("button").forEach(b => b.classList.toggle("isbest", S.best === b.dataset.pos));
+}
+function clearForms() {
+  S.cf = (S.g ? S.g.columns : []).map(() => ({}));
+  S.best = null; $("gcomment").value = ""; $("gcomb").value = ""; $("combdet").open = false; S.dirty = false;
+  if (S.g) { $("cols").querySelectorAll("textarea.ccomment").forEach(t => { t.value = ""; autoGrow(t); }); $("ranks").querySelectorAll("select").forEach(s => s.value = ""); syncSeg(); }
+  autoGrow($("gcomment"));
+}
+function setStatus(t, cls) { const s = $("status"); s.textContent = t; s.className = "status " + (cls || ""); }
+function renderProgress() {
+  $("progText").textContent = `${S.compared} / ${S.total} groups compared`;
+  $("progBar").style.width = S.total ? (100 * S.compared / S.total).toFixed(1) + "%" : "0";
+}
+
+/* ---------- save ---------- */
+async function save(goNext) {
+  if (!S.g || S.saving) return;
+  const g = S.g;
+  const columns = [];
+  g.columns.forEach((c, i) => { if (c.gated_hidden || c.missing) return; const f = S.cf[i] || {};
+    const has = FIELDS.some(k => f[k]) || (f.comment || "").trim();
+    if (has) { const o = { pos: c.pos, comment: f.comment || "" }; FIELDS.forEach(k => o[k] = f[k] ?? null); columns.push(o); } });
+  const rk = [...$("ranks").querySelectorAll("select")].filter(s => s.value).map(s => [+s.value, +s.dataset.pos]);
+  if (new Set(rk.map(r => r[0])).size !== rk.length) { setStatus("Ranking: each rank can be used only once.", "err"); $("ranks").scrollIntoView({ block: "center" }); return; }
+  const ranking = rk.sort((a, b) => a[0] - b[0]).map(r => r[1]);
+  const body = { group_id: g.group_id, session: SESSION, blind: g.blind, arms_sig: g.arms_sig,
+    annotator: $("annotator").value.trim() || "dermatologist", columns,
+    best: S.best === null ? null : (S.best === "none" ? "none" : +S.best), ranking,
+    comment: $("gcomment").value, combination_note: $("gcomb").value };
+  if (!columns.length && body.best === null && !ranking.length && !body.comment.trim() && !body.combination_note.trim()) {
+    setStatus("Nothing to save yet: fill a column, pick a best output or write a group comment.", "err");
+    if (isNarrow()) $("status").scrollIntoView({ block: "center" }); return; }
+  S.saving = true; setStatus("Saving…", "");
+  try {
+    const r = await api("/api/compare/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    store.set("annotator", body.annotator);
+    const li = S.groups[S.idx]; if (li) { if (!li.n_comp) S.compared++; li.n_comp = (li.n_comp || 0) + 1; }
+    renderProgress(); S.dirty = false;
+    const bestL = r.comparison.no_best ? "none" : (r.reveal.find(x => x.item_id === r.comparison.best_item_id) || {}).letter || "–";
+    const msg = `Saved comparison #${r.comparison.id} (${r.assessment_ids.length} column assessment${r.assessment_ids.length === 1 ? "" : "s"}). `;
+    const rev = r.reveal.map(x => `<b>${x.letter}</b> = ${esc(x.label)}`).join(" · ");
+    if (goNext && S.idx < S.groups.length - 1) {
+      $("banner").innerHTML = `<div class="banner">Previous group ${esc(g.group_id)}: ${rev} · best: <b>${esc(bestL)}</b></div>`;
+      await showGroup(S.idx + 1); setStatus(msg, "ok");
+    } else {
+      $("banner").innerHTML = g.blind ? `<div class="banner">Revealed: ${rev} · best: <b>${esc(bestL)}</b></div>` : "";
+      await showGroup(S.idx, true); setStatus(msg + (goNext ? "That was the last group in this list." : ""), "ok");
+    }
+  } catch (e) { setStatus("Save failed: " + e.message + " (your input is still in the form)", "err"); }
+  finally { S.saving = false; }
+}
+
+/* ---------- navigation ---------- */
+function confirmDiscard() { return !S.dirty || confirm("Discard the unsaved input for this group?"); }
+async function showGroup(idx, keepScroll) {
+  if (!S.groups.length) {
+    $("main").style.display = "none"; $("bottombar").style.visibility = "hidden"; $("empty").style.display = "block";
+    $("empty").textContent = $("fFilter").value === "uncompared" ? "All groups in this selection are compared. Switch “Show” to “All” to compare again." : "No comparison groups in this selection.";
+    return;
+  }
+  $("main").style.display = ""; $("bottombar").style.visibility = ""; $("empty").style.display = "none";
+  S.idx = Math.max(0, Math.min(idx, S.groups.length - 1));
+  const id = S.groups[S.idx].group_id; store.set("cmpLastGroup", id);
+  try { S.g = await api(`/api/compare/group?id=${encodeURIComponent(id)}&session=${SESSION}&blind=${$("blind").checked ? 1 : 0}`); }
+  catch (e) { setStatus("Load failed: " + e.message, "err"); return; }
+  S.cf = S.g.columns.map(() => ({}));
+  render(); clearForms(); setStatus("", "");
+  $("pos").textContent = `${S.idx + 1} / ${S.groups.length}`;
+  const atStart = S.idx === 0, atEnd = S.idx >= S.groups.length - 1;
+  $("prev").disabled = $("bPrev").disabled = atStart; $("next").disabled = $("bNext").disabled = atEnd;
+  if (!keepScroll) window.scrollTo({ top: 0 });
+}
+function go(d) {
+  const n = S.idx + d; if (n < 0 || n >= S.groups.length) return;
+  if (!confirmDiscard()) return; $("banner").innerHTML = ""; showGroup(n);
+}
+async function loadList(keepId) {
+  const set = $("fSet").value, flt = $("fFilter").value, dx = $("fDx").value, fst = $("fFst").value;
+  store.set("cmpSet", set); store.set("cmpFilter", flt); store.set("cmpDx", dx); store.set("cmpFst", fst);
+  const r = await api(`/api/compare/groups?set=${encodeURIComponent(set)}&filter=${flt}&dx=${encodeURIComponent(dx)}&fst=${encodeURIComponent(fst)}`);
+  S.groups = r.groups; S.total = r.total; S.compared = r.compared; renderProgress();
+  $("fDx").innerHTML = `<option value="">All diagnoses</option>` + r.diagnoses.map(d => `<option>${esc(d)}</option>`).join("");
+  $("fDx").value = r.diagnoses.includes(dx) ? dx : "";
+  const roman = ["", "I", "II", "III", "IV", "V", "VI"];
+  $("fFst").innerHTML = `<option value="">All</option>` + r.fsts.map(f => `<option value="${f}">${roman[f] || f}</option>`).join("");
+  $("fFst").value = r.fsts.map(String).includes(fst) ? fst : "";
+  const idx = keepId ? S.groups.findIndex(x => x.group_id === keepId) : 0;
+  await showGroup(idx < 0 ? 0 : idx);
+}
+async function init() {
+  attachAutoGrow();
+  if (isNarrow()) $("plandet").open = store.get("cmpPlanOpen", "0") === "1";
+  $("plandet").addEventListener("toggle", () => { if (isNarrow()) store.set("cmpPlanOpen", $("plandet").open ? "1" : "0"); });
+  $("annotator").value = store.get("annotator", "dermatologist");
+  $("annotator").addEventListener("change", () => store.set("annotator", $("annotator").value.trim() || "dermatologist"));
+  $("blind").checked = store.get("cmpBlind", "1") === "1";
+  $("blind").addEventListener("change", () => {
+    if (!confirmDiscard()) { $("blind").checked = !$("blind").checked; return; }
+    store.set("cmpBlind", $("blind").checked ? "1" : "0"); $("banner").innerHTML = ""; showGroup(S.idx);
+  });
+  const cfg = await api("/api/compare/config");
+  $("fSet").innerHTML = `<option value="">All comparison sets</option>` + cfg.sets.map(s => `<option value="${esc(s.name)}">${esc(s.name)} (${s.compared}/${s.n})</option>`).join("");
+  const ss = store.get("cmpSet", ""); if (cfg.sets.some(s => s.name === ss)) $("fSet").value = ss;
+  $("fFilter").value = store.get("cmpFilter", "uncompared");
+  const dx = store.get("cmpDx", ""); if (dx) $("fDx").innerHTML += `<option>${esc(dx)}</option>`; $("fDx").value = dx;
+  const fst = store.get("cmpFst", ""); if (fst) $("fFst").innerHTML += `<option value="${esc(fst)}">${esc(fst)}</option>`; $("fFst").value = fst;
+  $("fSet").addEventListener("change", () => { if (confirmDiscard()) { $("fDx").value = ""; $("fFst").value = ""; loadList(); } });
+  for (const id of ["fFilter", "fDx", "fFst"]) $(id).addEventListener("change", () => { if (confirmDiscard()) loadList(); });
+  const deep = new URLSearchParams(location.search).get("group");
+  if (deep) { $("fFilter").value = "all"; $("fSet").value = ""; $("fDx").value = ""; $("fFst").value = ""; history.replaceState(null, "", "/compare"); }
+  await loadList(deep || store.get("cmpLastGroup", null));
+}
+
+/* ---------- buttons & keys ---------- */
+$("filterBtn").onclick = () => { const h = $("hdr"); h.classList.toggle("showfilters"); $("filterBtn").setAttribute("aria-expanded", h.classList.contains("showfilters")); };
+$("prev").onclick = $("bPrev").onclick = () => go(-1); $("next").onclick = $("bNext").onclick = () => go(1);
+$("save").onclick = () => save(false); $("saveNext").onclick = $("bSaveNext").onclick = () => save(true);
+$("clear").onclick = () => { if (confirmDiscard()) clearForms(); };
+["gcomment", "gcomb"].forEach(id => $(id).addEventListener("input", () => S.dirty = true));
+document.addEventListener("keydown", (e) => {
+  const typing = isTyping(e.target);
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); save(true); return; }
+  if (e.key === "Escape") { if (typing) e.target.blur(); return; }
+  if (typing || e.ctrlKey || e.metaKey || e.altKey || Zoom.isOpen()) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+});
+window.addEventListener("beforeunload", (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ""; } });
+init().catch(e => { document.body.insertAdjacentHTML("beforeend", `<div class="empty">Failed to load: ${esc(e.message)}</div>`); });
+</script>
+</body>
+</html>
