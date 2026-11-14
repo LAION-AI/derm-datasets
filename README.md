@@ -23,7 +23,7 @@ Scripts are numbered in the order in which they run. All of them read and write 
 | `29`–`34` | CLIP / MedSigLIP / EmbeddingGemma embeddings, image-type and Fitzpatrick heads |
 | `40`–`42` | build the dataset, statistics, public release (open tier + metadata) |
 | `50`–`58` | Derm1M index and comparison, benchmark overlap, diagnosis linking (SapBERT), concept map |
-| `60`–`69` | CLIP evaluation and equal-compute fine-tuning, decision models, CNN baseline, adapters, linear probes |
+| `60`–`69` | CLIP evaluation and equal-compute fine-tuning, export of fine-tuned CLIP models to the Hugging Face layout (`66_export_clip_hf.py`; released models: https://huggingface.co/laion/DermaLit-CLIP-ViT-B-16), decision models, CNN baseline, adapters, linear probes |
 | `70`–`78` | bias analyses: skin type, population references, disease prevalence (GBD 2019), sex, per-skin-type performance |
 | `71`, `105_relaion5b`, `106_laion_index_head`, `107_laion_index_score` | dermatology images in Re-LAION: one-shard pilot, caption scan of all 5.35 B pairs, linear head in ViT-L/14 space, scoring of all 966 M index entries on compressed vectors, nudity screen, precision review |
 | `79`–`84` | pool of permissively licensed reference photographs (CC BY / CC0) |

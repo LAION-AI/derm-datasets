@@ -53,6 +53,7 @@ def main():
     ap.add_argument("--wd", type=float, default=0.1)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--grad-ckpt", action="store_true", help="gradient checkpointing: same result, less GPU memory")
     a = ap.parse_args()
     torch.manual_seed(a.seed); random.seed(a.seed); np.random.seed(a.seed)
     os.makedirs(a.out, exist_ok=True)
@@ -63,6 +64,8 @@ def main():
         aug_cfg=dict(scale=(0.4, 1.0), color_jitter=(0.32, 0.32, 0.32, 0.08), color_jitter_prob=0.8,
                      gray_scale_prob=0.2))
     model = model.to(dev).train()
+    if a.grad_ckpt:
+        model.set_grad_checkpointing(True)
     tok = open_clip.get_tokenizer(a.model)
     df = pd.read_parquet(a.pairs)
     dl = DataLoader(Pairs(df, tf_train, tok), batch_size=a.bs, shuffle=True, num_workers=a.workers,
